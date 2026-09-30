@@ -49,7 +49,7 @@ Open your agent in the repo you want to share and say "make a seed of this proje
 
 1. **Reads the project first:** README, docs, tests, code, PR history, design and review
    docs. It works out the idea, the core, the history and what looks private.
-2. **Asks only what it can't tell:** at most 4 questions, e.g. how much to disclose, or
+2. **Asks only what it can't tell:** only questions whose answers change the seed, e.g. how much to disclose, or
    where your docs and code disagree. Each question offers its own best guess as the default.
 3. **Writes `seed/`:**
    ```

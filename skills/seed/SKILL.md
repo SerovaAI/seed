@@ -94,8 +94,14 @@ Record each answer with its evidence and a confidence level.
 ## Step 2 — Ask only about the gaps
 
 Show the author a short summary of what you found (product, core vs. shell, proposed
-private list) so they can correct it at a glance. Then ask — in one round,
-at most 4 questions, using a structured question tool if your agent has one — only what the project couldn't answer:
+private list) so they can correct it at a glance. Then ask what the project couldn't answer.
+
+**There's no fixed number of questions; there's a bar.** Ask a question only if both hold:
+the project can't answer it, and the answer changes what the seed says. Everything that
+fails the bar becomes an `(inferred)` default in the review instead. Ask the questions
+together in one batch, most consequential first, using a structured question tool if your
+agent has one (split into several calls if the tool limits how many fit in one). Typical
+candidates:
 
 - Disagreements from Step 1 where the difference changes what the seed says. Skip ones where
   the code is clearly current, and unexplained reversals that don't affect the rebuild.
