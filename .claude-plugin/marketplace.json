@@ -1,0 +1,11 @@
+{
+  "name": "serova",
+  "owner": { "name": "Serova" },
+  "plugins": [
+    {
+      "name": "seed",
+      "source": "./",
+      "description": "Turn a codebase into a shareable, stack-agnostic seed."
+    }
+  ]
+}

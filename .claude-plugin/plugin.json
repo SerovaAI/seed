@@ -1,0 +1,6 @@
+{
+  "name": "seed",
+  "version": "0.1.0",
+  "description": "Turn a codebase into a seed: a shareable folder with the idea, context, commitments, examples and checks, so someone else's agent can grow their own version without seeing the code.",
+  "author": { "name": "Serova" }
+}
