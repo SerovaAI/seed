@@ -11,6 +11,19 @@ examples, and a way to check the result — and nothing that ties them to your i
 
 > Same seed, different soil, different plant — but you can check it's the right species.
 
+Keep the metaphor in mind; it settles most judgment calls:
+
+- **An idea is a description of the plant.** It's easy to admire and grows into anything.
+- **Code is a cutting.** It's an exact clone that only thrives in the parent's soil, and it
+  gives everything away.
+- **A seed carries the genetics.** It carries what makes it *this* plant (the commitments)
+  and leaves out how the parent happened to grow.
+- **The receiver's stack is the soil.** Ask about it (profile questions); don't prescribe it.
+- **The checks are the species test.** However it grew, is it the right species?
+
+When unsure whether something belongs in the seed, ask: *is this genetics, or is it how my
+plant happened to grow?*
+
 You are running on the **author's** machine, reading their code. The code never leaves; only
 the `seed/` folder does. Your job is to extract what matters and leave behind what doesn't.
 
@@ -147,6 +160,9 @@ seed/
 
 ### `SEED.md`
 
+- **Open with the framing**, one or two lines for the receiver: this is a seed, not a
+  cutting. Grow your own version in your own soil. The commitments are the genetics to
+  keep, and the checks confirm it's the right species.
 - **What it is** — one paragraph a stranger understands.
 - **The problem and who it's for.**
 - **The core loop / how it works** — conceptually, as a user or system experiences it.

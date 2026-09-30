@@ -10,6 +10,30 @@ their own stack, and runs your checks against it.
 
 > Same seed, different soil, different plant, but you can check it's the right species.
 
+## Why a seed
+
+There are three ways to pass on something you've built. Plants have the same three.
+
+| You could share… | Like handing over… | What goes wrong |
+|---|---|---|
+| **The idea** (a blog post, a demo) | a description of the plant | It's easy to admire and easy to get wrong. Nothing pins down what it must be, so every attempt grows into something different. |
+| **The code** | a cutting | It's an exact clone of your plant, but it only thrives in soil like yours: your stack, your conventions, your assumptions. It also gives away everything. |
+| **A seed** | a seed | It carries what makes it *this* plant and nothing about how yours happened to grow. |
+
+The parts of a seed map onto the metaphor:
+
+- **The genetics are the commitments.** They cover what it must do, what it must never do, and
+  the decisions that make it this thing and not a lookalike (`SEED.md`, `COMMITMENTS.md`).
+- **The soil is the receiver's world.** That means their stack, platform and constraints. The
+  seed asks about the soil before growing (profile questions) and doesn't prescribe it.
+- **The plant is the code.** Each receiver grows their own. The code will look different
+  every time, and that's fine.
+- **The species check is the checks.** However it grew, you can test that it's the right
+  species (`checks/`). A pass is necessary, not sufficient: a healthy plant still needs
+  someone to look at it (`CHECKLIST.md`, `quality.md`).
+- **What stays behind is yours.** Your plant, your garden and your trade secrets. A seed
+  carries only what it needs to grow.
+
 This repo holds one skill, `seed`, which builds a seed from a codebase. It's a standard
 [Agent Skills](https://agentskills.io) `SKILL.md`, so it works in any agent that supports the
 format: Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, and others.
