@@ -10,30 +10,42 @@ their own stack, and runs your checks against it.
 
 > Same seed, different soil, different plant, but you can check it's the right species.
 
-This repo is a Claude Code plugin with one skill, `seed`, which builds a seed from a
-codebase.
+This repo holds one skill, `seed`, which builds a seed from a codebase. It's a standard
+[Agent Skills](https://agentskills.io) `SKILL.md`, so it works in any agent that supports the
+format: Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, and others.
 
 ## Install
 
-In Claude Code:
+This is a private repo, so your git access must be able to read it.
+
+**Any agent** — the skill is just the folder `skills/seed/`. Copy or symlink it into your
+agent's skills directory:
+
+| Agent | Personal | Per project |
+|---|---|---|
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| Codex, Gemini CLI, Copilot, Cursor and others (shared path) | `~/.agents/skills/` | `.agents/skills/` |
+
+```sh
+git clone git@github.com:SerovaAI/seed.git ~/src/seed
+ln -s ~/src/seed/skills/seed ~/.agents/skills/seed     # or ~/.claude/skills/seed
+```
+
+Check your agent's docs if it uses a different path. The
+[`skills` CLI](https://github.com/vercel-labs/skills) can also install it into most agents:
+`npx skills add SerovaAI/seed`.
+
+**Claude Code as a plugin** — instead of copying:
 
 ```
 /plugin marketplace add SerovaAI/seed
 /plugin install seed@serova
 ```
 
-This is a private repo, so your GitHub access (`gh auth login`, or git credentials) must be
-able to read it.
-
 ## Make a seed (the author)
 
-Open Claude Code in the repo you want to share and say:
-
-```
-/seed
-```
-
-or just "make a seed of this project". The skill:
+Open your agent in the repo you want to share and say "make a seed of this project" (or
+`/seed` in agents that expose skills as commands). The skill:
 
 1. **Reads the project first:** README, docs, tests, code, PR history, design and review
    docs. It works out the idea, the core, the history and what looks private.

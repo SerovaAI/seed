@@ -52,7 +52,8 @@ Build understanding from, in rough order of value:
 - Build and deploy config — reveals the shell around the core (mobile wrapper, server,
   CLI) and what's incidental.
 
-For anything larger than a few thousand lines, fan out read-only subagents in parallel and
+For anything larger than a few thousand lines, if your agent can run subagents or parallel
+tasks, fan out read-only ones by area (otherwise work through the areas in turn), and
 have them report conclusions with `file:line` evidence, not file dumps. A split that works:
 
 - **Core rules** — the runtime behaviour, state model, invariants, and examples from tests.
@@ -93,8 +94,8 @@ Record each answer with its evidence and a confidence level.
 ## Step 2 — Ask only about the gaps
 
 Show the author a short summary of what you found (product, core vs. shell, proposed
-private list) so they can correct it at a glance. Then ask — in one AskUserQuestion call,
-at most 4 questions — only what the project couldn't answer:
+private list) so they can correct it at a glance. Then ask — in one round,
+at most 4 questions, using a structured question tool if your agent has one — only what the project couldn't answer:
 
 - Disagreements from Step 1 where the difference changes what the seed says. Skip ones where
   the code is clearly current, and unexplained reversals that don't affect the rebuild.
@@ -206,7 +207,7 @@ Keep checks honest: *a failure is a real deviation; a pass is necessary, not suf
 
 ### Writing with subagents
 
-For a large seed, split the writing by area (e.g. core rules + their checks; data + quality
+If your agent supports subagents, for a large seed split the writing by area (e.g. core rules + their checks; data + quality
 + its checker). Give each subagent exact ownership of specific files, so no two write the
 same one; have them put shared sections as fragments in a scratch directory; then assemble
 `COMMITMENTS.md` and `ADAPTER.md` yourself. **After each subagent returns, verify that every
@@ -230,7 +231,8 @@ or write it yourself from the evidence.
    against it by construction. So mutate something (bump an expected value, break one rule
    in a copy of the output) and confirm the checks catch it. A check that can't fail proves
    nothing.
-4. **Optional blind regrow** (offer it; it costs time and tokens): spawn a subagent that
+4. **Optional blind regrow** (offer it; it costs time and tokens; needs subagent support, or
+   a separate fresh agent session): start a fresh agent that
    may read *only* `seed/` in an empty directory, has no web access to the original, and
    builds the core stages in a different stack. Run the checks on it. Then look for gaps:
    anything where the rebuild passes the checks but behaves differently from the original
