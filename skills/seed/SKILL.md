@@ -254,7 +254,11 @@ Before calling the seed done, check it for leakage and show the author what it r
   mirroring of a specific function).
 - Confirm nothing from the Private pile appears.
 
-Write `seed-review.md` **next to** `seed/`, not inside it — it is for the author only:
+Write `seed-review.md` **next to** `seed/`, not inside it — it is for the author only.
+It maps where sensitive material lives, so it must never be committed: if the project is a
+git repo, add `seed-review.md` to `.git/info/exclude` (local-only, so the author's
+`.gitignore` stays untouched) and check that `git check-ignore seed-review.md` confirms it.
+Tell the author you did this. It covers:
 
 - What the seed discloses, section by section, at a glance.
 - What was deliberately left out (incidental and private), so the author can pull more in.
