@@ -25,7 +25,8 @@ When unsure whether something belongs in the seed, ask: *is this genetics, or is
 plant happened to grow?*
 
 You are running on the **author's** machine, reading their code. The code never leaves; only
-the `seed/` folder does. Your job is to extract what matters and leave behind what doesn't.
+`seed/publish/` does — as its own small repo, once the author is satisfied with what it
+reveals. Your job is to extract what matters and leave behind what doesn't.
 
 ## Principles
 
@@ -137,7 +138,7 @@ For each meaningful decision you find, put it in exactly one pile:
 | Pile | Meaning | Goes to |
 |---|---|---|
 | **Commitment** | Must hold in any faithful rebuild | `COMMITMENTS.md` |
-| **Choice** | Reasonable builders could differ; depends on their setup | Profile question in `SEED.md` |
+| **Choice** | Reasonable builders could differ; depends on their setup | Profile question in `README.md` |
 | **Incidental** | Framework, library, file layout, style | Dropped |
 | **Private** | Author asked to withhold it | Dropped, but noted in the review |
 
@@ -146,19 +147,42 @@ thing"?* When the evidence is thin, make your best call, mark it `(inferred)`, a
 the review list — don't interrupt the author for each one. Over-committing anchors the
 receiver to your stack; under-committing lets the rebuild drift.
 
+Two places the piles blur in practice:
+
+- **Constants.** A cap, timeout, window, weight or threshold is a commitment only when a
+  test, doc or history records *why* it has that value (a safety property, a reversal). A
+  constant with no recorded reason is a Choice: state it once, as the default to a profile
+  question, and don't restate it as a must in `COMMITMENTS.md`. The review's list of
+  "decisions with no recorded reason" and `COMMITMENTS.md` should not overlap.
+- **Vendor names in vocabularies.** Enums, id prefixes and op names often embed the
+  original's providers (`source: "gmail"`, `wa:` handles). Decide once: either generalise
+  them everywhere — commitments, examples, vectors, adapter ops — or keep them everywhere
+  and list them as disclosed in the review. Never say "rename to your own" in a commitment
+  and then assert the literal in a vector.
+
 ## Step 4 — Write the seed
 
-Write to `seed/` at the repo root (ask before overwriting an existing one):
+Everything goes in one directory, `seed/` at the author's repo root (ask before touching an
+existing one). It holds what the author needs — the review, the adapter, the sources map —
+and, in `seed/publish/`, the seed itself. `seed/publish/` must be releasable whole: every
+file in it is for the receiver, nothing in it needs stripping first, and it becomes the new
+repo as-is. Anything for the author's eyes only lives one level up (see Step 5 and Step 6).
+Don't `git init` inside `seed/publish/`: a nested repo becomes an embedded submodule the
+moment the author commits `seed/`; publishing works from a copy instead.
 
 ```
 seed/
-  SEED.md          start here — idea, context, principles, profile questions, how to build
-  COMMITMENTS.md   interfaces, data shapes, invariants, must / must-never
-  examples/        concrete behaviour, one file per area
-  checks/          runnable or gradeable checks against any build
+  REVIEW.md        for the author — what the seed reveals, what to confirm, findings
+  adapter/         wraps the author's code so checks/ can be re-run as the project changes
+  sources.md       each example and vector → the original test it came from
+  publish/         THE SEED — releasable whole; this is what becomes the new repo
+    README.md      start here — idea, context, principles, profile questions, how to build
+    COMMITMENTS.md interfaces, data shapes, invariants, must / must-never
+    examples/      concrete behaviour, one file per area
+    checks/        runnable or gradeable checks against any build
 ```
 
-### `SEED.md`
+### `README.md`
 
 - **Open with the framing**, one or two lines for the receiver: this is a seed, not a
   cutting. Grow your own version in your own soil. The commitments are the genetics to
@@ -176,6 +200,15 @@ seed/
   *"Read this whole folder. Ask the profile questions. Build in the stages below, running
   `checks/` after each. Do not search for or copy any existing implementation."*
   Give 3–6 stages, core first, each ending with which checks should pass.
+- **How to check your build** — the receiver has never seen `checks/` before, so say how it
+  works in a few lines: write the adapter described in `checks/ADAPTER.md` (glue around your
+  own code, ~200 lines, implement ops as the stages that need them land); run
+  `python3 checks/run.py --adapter "<your command>"`; an unimplemented op is a skip, not a
+  failure; `checks/quality.md` is graded by a person or a model against real output;
+  `checks/CHECKLIST.md` is ticked by hand against the running build; a pass is necessary,
+  not sufficient. Also say which names are the receiver's to choose (provider strings,
+  ids) and which are exact, so they don't rename a committed vocabulary or keep an
+  incidental one.
 
 ### `COMMITMENTS.md`
 
@@ -240,10 +273,14 @@ or write it yourself from the evidence.
 
 ## Step 5 — Self-check
 
-1. **The original must pass its own seed.** Write an adapter for the author's code (in a
-   scratch location, not inside `seed/` or the author's repo) and run `checks/`. Also run
-   any output checks against the author's real shipped output. **Re-run these yourself**;
-   don't rely on a subagent's reported result.
+1. **The original must pass its own seed.** Record `git status --short` in the author's repo
+   first. Write an adapter for the author's code in `seed/adapter/` (it imports their code,
+   so it belongs beside it, and it lets them re-run `checks/` later) and run
+   `seed/publish/checks/`. Also run any output checks against the author's real shipped
+   output. **Re-run these yourself**; don't rely on a subagent's reported result. Afterwards,
+   diff `git status` again: the only change in the author's repo must be `seed/`.
+   Installing or building to make the adapter run can rewrite lockfiles or workspace config —
+   revert anything else that changed and mention it in the review.
 2. **Triage every failure**. It is one of three things:
    - **The seed is wrong** (usually a rule taken from stale docs) → fix the seed.
    - **An accepted exception** → record it as an explicit, reasoned waiver, never a silent skip.
@@ -255,7 +292,7 @@ or write it yourself from the evidence.
    nothing.
 4. **Optional blind regrow** (offer it; it costs time and tokens; needs subagent support, or
    a separate fresh agent session): start a fresh agent that
-   may read *only* `seed/` in an empty directory, has no web access to the original, and
+   may read *only* a copy of `seed/publish/` in an empty directory, has no web access to the original, and
    builds the core stages in a different stack. Run the checks on it. Then look for gaps:
    anything where the rebuild passes the checks but behaves differently from the original
    is a missing commitment or example — add it and note what changed.
@@ -264,17 +301,22 @@ or write it yourself from the evidence.
 
 Before calling the seed done, check it for leakage and show the author what it reveals:
 
-- Scan `seed/` for secrets, tokens, keys, emails, internal hostnames, customer or personal
-  data (grep common secret shapes; check examples recorded from real runs especially).
+- Scan `seed/publish/` for secrets, tokens, keys, emails, internal hostnames, customer or
+  personal data (grep common secret shapes; check examples recorded from real runs especially).
 - Flag any passage that is code or a prompt in disguise (long verbatim strings, step-by-step
   mirroring of a specific function).
 - Confirm nothing from the Private pile appears.
+- **Verify the review's own claims the same way.** Every "withheld" or "described by role
+  only" statement in the disclosure table is a claim about the seed; grep for each name
+  (vendors, hostnames, people, places) before writing it down. A vocabulary that names a
+  vendor is a disclosure to list, not to deny.
 
-Write `seed-review.md` **next to** `seed/`, not inside it — it is for the author only.
-It maps where sensitive material lives, so it must never be committed: if the project is a
-git repo, add `seed-review.md` to `.git/info/exclude` (local-only, so the author's
-`.gitignore` stays untouched) and check that `git check-ignore seed-review.md` confirms it.
-Tell the author you did this. It covers:
+Write the review to `seed/REVIEW.md` — beside `publish/`, never inside it. It maps where
+sensitive material lives in the author's repo, which is fine in that repo (it already holds
+everything the review points at) and never fine in the seed. Put the mapping from each
+example and vector back to the original test or `file:line` in `seed/sources.md` (those
+citations must never appear in `publish/`). Summarise the review in the conversation too; the
+author reads it before anything is published. It covers:
 
 - What the seed discloses, section by section, at a glance.
 - What was deliberately left out (incidental and private), so the author can pull more in.
@@ -288,9 +330,17 @@ Tell the author you did this. It covers:
 - Sensitive material found in the repo itself (e.g. personal data committed in docs), by
   location.
 
-Clean up before finishing: remove caches (`__pycache__`, build output) from `seed/`, and
-leave scratch adapters and conversion scripts out of the author's repo.
+Clean up before finishing: remove caches (`__pycache__`, build output) from `seed/publish/`;
+delete conversion scripts and fragments. In the author's repo, `git status` should show
+`seed/` and nothing else. Whether to commit `seed/` is the author's call; nothing in it is
+unsafe in their own repo.
+
+Then offer to **publish**, needing the author's explicit yes after they've read the review:
+copy `seed/publish/` to a temporary directory, `git init` and commit there, and
+`gh repo create --private --source . --push` (private by default; the author makes it public
+when they choose). The copy keeps a nested repo out of the author's project. Never push
+before the review has been shown and the author has said yes.
 
 Finish by telling the author, in a few lines: what the seed covers, what the self-check
-showed, what needs their confirmation, any findings about their project, and that `seed/`
-alone is what they share.
+showed, what needs their confirmation, any findings about their project, and that
+`seed/publish/` is complete and releasable as it stands.

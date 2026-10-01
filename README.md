@@ -23,7 +23,7 @@ There are three ways to pass on something you've built. Plants have the same thr
 The parts of a seed map onto the metaphor:
 
 - **The genetics are the commitments.** They cover what it must do, what it must never do, and
-  the decisions that make it this thing and not a lookalike (`SEED.md`, `COMMITMENTS.md`).
+  the decisions that make it this thing and not a lookalike (`README.md`, `COMMITMENTS.md`).
 - **The soil is the receiver's world.** That means their stack, platform and constraints. The
   seed asks about the soil before growing (profile questions) and doesn't prescribe it.
 - **The plant is the code.** Each receiver grows their own. The code will look different
@@ -75,41 +75,55 @@ Open your agent in the repo you want to share and say "make a seed of this proje
    docs. It works out the idea, the core, the history and what looks private.
 2. **Asks only what it can't tell:** only questions whose answers change the seed, e.g. how much to disclose, or
    where your docs and code disagree. Each question offers its own best guess as the default.
-3. **Writes `seed/`:**
+3. **Writes `seed/`** in your repo. Everything for you sits at the top; the seed itself is
+   `seed/publish/`, releasable as-is.
    ```
    seed/
-     SEED.md          start here: idea, principles, decisions and why, profile questions, build stages
-     COMMITMENTS.md   interfaces, data shapes, invariants, must / must-never
-     examples/        concrete behaviour, drawn from your tests and real runs
-     checks/          vectors plus a runner that works with any build, a quality rubric, a manual checklist
+     REVIEW.md        for you: what the seed reveals, what to confirm, what it found in your project
+     adapter/         wraps your code so you can re-run the checks as the project changes
+     sources.md       each example and vector, mapped back to the test it came from
+     publish/         the seed — this becomes the new repo
+       README.md        start here: idea, principles, decisions and why, profile questions, build stages
+       COMMITMENTS.md   interfaces, data shapes, invariants, must / must-never
+       examples/        concrete behaviour, drawn from your tests and real runs
+       checks/          vectors plus a runner that works with any build, a quality rubric, a manual checklist
    ```
 4. **Self-checks:** your original code must pass its own seed. Any failure is either a wrong
    rule in the seed, an accepted exception, or a bug in your project, and it tells you which.
-5. **Reviews disclosure:** it scans for secrets and personal data and writes
-   `seed-review.md` *next to* `seed/`, for your eyes only. The review covers what the seed
-   reveals, what was left out, what you need to confirm, and anything it found in your
-   project along the way.
+5. **Reviews disclosure, then offers to publish:** it scans for secrets and personal data
+   and writes `seed/REVIEW.md` — what the seed reveals, what was left out, what you need to
+   confirm, and anything it found in your project along the way. Only after you've read that
+   does it offer to create the GitHub repo from `seed/publish/` (private by default) and push.
 
-**Share only the `seed/` folder.** Read `seed-review.md` before you do.
+`seed/publish/` is releasable as it stands — nothing in it needs stripping. `seed/` as a
+whole is yours to commit or not; nothing in it is unsafe in your own repo.
 
 Expect a real run to take a while and use a fair number of tokens. On a mid-sized project it
 fans out several subagents.
 
 ## Grow from a seed (the receiver)
 
-You don't need this plugin. Put the `seed/` folder in an empty directory, open any coding
-agent there, and say:
+You don't need this plugin. Clone the seed repo, open any coding agent in it, and say:
 
 ```
-Build this from seed/SEED.md. Ask me the profile questions first.
+Build this from the README. Ask me the profile questions first.
 ```
 
-`SEED.md` tells the agent to:
+The README tells the agent to:
 - read the whole folder;
 - ask you the setup questions (platform, backend, and so on), with the author's choices as
   defaults;
 - build in stages, running `checks/` after each one;
 - never look for the original.
+
+Checking a build works the same way for every seed. The agent writes a small **adapter** —
+glue around its own code that reads one test case as JSON on stdin and writes the result on
+stdout, described in `checks/ADAPTER.md` — and runs
+`python3 checks/run.py --adapter "<your command>"`. Ops it hasn't built yet are skipped, not
+failed. Two parts of `checks/` aren't automated: `quality.md` is a rubric for a person or a
+model to grade real output against, and `CHECKLIST.md` is ticked by hand against the running
+build. A pass means the build hasn't deviated on anything the checks can see; it doesn't mean
+the build is finished.
 
 ## Status
 
